@@ -1,0 +1,21 @@
+{
+    "name": "shortcodes/tests",
+    "description": "This is test package for Laravel Application",
+    "type": "package",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "license": "mit",
+    "authors": [
+        {
+            "name": "Roman Szymanski",
+            "email": "roman.szymanski@shortcodes.pl"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Shortcodes\\Tests\\": "src/"
+        }
+    }
+}
