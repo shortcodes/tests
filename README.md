@@ -1,9 +1,9 @@
 # Test tools for laravel application
 This is package of test tools to help test laravel app properly
 
-#Tools
+# Tools
 
-####Api CRUD testing
+#### Api CRUD testing
 
 To test CRUD in your API you need to create test that extends `Shortcodes\Tests\Blueprints\ApiCrudTest` and provide model class in protected property
 
@@ -36,7 +36,7 @@ If `index` method requires some query string parameters you can define it in cla
         }
     }
     
-####Form Request testing
+#### Form Request testing
 
 To test Form Request in your API you need to create test that extends `Shortcodes\Tests\Blueprints\FormRequestTest` and provide request class in protected property
 
@@ -87,7 +87,7 @@ There is also possibility to test request whit required injected model like with
         }
     }
     
-####Api request testing
+#### Api request testing
 
 To test Api Request in you need to create test that extends `Shortcodes\Tests\Blueprints\TestCase`. This is a simple wrapper on standard method that allows to write less code.
 
