@@ -51,7 +51,7 @@ abstract class FormRequestTest extends TestCase
                 $rule = $k;
             }
 
-            if (!isset($errors[$rule])) {
+            if (!isset($this->errors[$rule])) {
                 $this->assertTrue(false);
             }
         }
@@ -70,7 +70,7 @@ abstract class FormRequestTest extends TestCase
                 $rule = $k;
             }
 
-            if (isset($errors[$rule])) {
+            if (isset($this->errors[$rule])) {
                 $this->assertTrue(false);
             }
         }
