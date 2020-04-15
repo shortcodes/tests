@@ -41,7 +41,7 @@ abstract class ApiCrudTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->withHeaders(['X-App-Token' => env('AUTH_KEY')])
-            ->json('GET', route($this->getRoutePrefix() . '.show', [$this->model => $object->id]));
+            ->json('GET', route($this->getRoutePrefix() . '.show', [Str::snake(class_basename($this->model)) => $object->id]));
 
         $response->assertStatus(200)
             ->assertJson([
@@ -77,7 +77,7 @@ abstract class ApiCrudTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->withHeaders(['X-App-Token' => env('AUTH_KEY')])
-            ->json('PATCH', route($this->getRoutePrefix() . '.update', [$this->model => $object->id]), $this->objectFactory()->make()->toArray());
+            ->json('PATCH', route($this->getRoutePrefix() . '.update', [Str::snake(class_basename($this->model)) => $object->id]), $this->objectFactory()->make()->toArray());
 
         $response->assertStatus(200);
     }
@@ -92,7 +92,7 @@ abstract class ApiCrudTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->withHeaders(['X-App-Token' => env('AUTH_KEY')])
-            ->json('DELETE', route($this->getRoutePrefix() . '.destroy', [$this->model => $object->id]));
+            ->json('DELETE', route($this->getRoutePrefix() . '.destroy', [Str::snake(class_basename($this->model)) => $object->id]));
 
         $response->assertStatus(204);
 
