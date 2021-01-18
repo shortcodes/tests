@@ -12,14 +12,14 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
-    protected function apiRequest($method, $uri, $data = [], $headers = [])
+    protected function apiRequest($method, $uri, $data = [], $headers = [], $driver = null)
     {
         if (!$this->user) {
             $this->user = factory(User::class)->create();
         }
 
         $query = $this
-            ->actingAs($this->user)
+            ->actingAs($this->user, $driver)
             ->withHeaders([
                 'X-App-Token' => env('AUTH_KEY'),
             ])
