@@ -2,6 +2,7 @@
 
 namespace Shortcodes\Tests\Blueprints;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,48 @@ abstract class FormRequestTest extends TestCase
     protected $model;
     private $request;
     private $errors;
+    protected $asUser = null;
+    protected $headers = [];
+
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $this->transformHeadersToServerVars($headers);
+
+        return $this;
+    }
+
+    public function getHeaders()
+    {
+        if ($this->headers) {
+            return $this->headers;
+        }
+
+        if (method_exists($this, 'usingHeaders')) {
+            return $this->transformHeadersToServerVars($this->usingHeaders());
+        }
+
+        return [];
+    }
+
+    public function as($user)
+    {
+        $this->asUser = $user;
+
+        return $this;
+    }
+
+    public function getUser()
+    {
+        if ($this->asUser) {
+            return $this->asUser;
+        }
+
+        if (method_exists($this, 'asUser')) {
+            return $this->asUser();
+        }
+
+        return null;
+    }
 
     public function assertValidRequest()
     {
@@ -36,6 +79,10 @@ abstract class FormRequestTest extends TestCase
         } catch (ValidationException $exception) {
 
             $this->errors = $exception->errors();
+
+            $this->assertTrue(true);
+        } catch (AuthorizationException $exception){
+            $this->errors = $exception->getMessage();
 
             $this->assertTrue(true);
         }
@@ -84,9 +131,12 @@ abstract class FormRequestTest extends TestCase
     public function prepareRequest($payload, $model = null)
     {
 
-        $this->request = new $this->model([], [], [], [], [], ($model ? ['REQUEST_URI' => $this->getModelPath() . '/' . $model->id] : []));
+        $this->request = new $this->model([], [], [], [], [], ($model ? array_merge(['REQUEST_URI' => $this->getModelPath() . '/' . $model->id], $this->getHeaders())  : $this->getHeaders()));
         $this->request->setContainer(app());
         $this->request->setRedirector(app(\Illuminate\Routing\Redirector::class));
+        $this->request->setUserResolver(function () {
+            return $this->getUser();
+        });
 
         $this->request->merge($payload);
 
@@ -95,6 +145,24 @@ abstract class FormRequestTest extends TestCase
         }
 
         return $this;
+    }
+
+    protected function transformHeadersToServerVars(array $headers)
+    {
+        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
+            $name = strtr(strtoupper($name), '-', '_');
+
+            return [$this->formatServerHeaderKey($name) => $value];
+        })->all();
+    }
+
+    protected function formatServerHeaderKey($name)
+    {
+        if (!Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE' && $name !== 'REMOTE_ADDR') {
+            return 'HTTP_' . $name;
+        }
+
+        return $name;
     }
 
     private function getModelPath()
